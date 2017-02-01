@@ -136,26 +136,56 @@ void loop()
     motorB_setpower(0, false);
     while (true)
     {
-      float left1 = (digitalRead(LINESENSOR4) & digitalRead(LINESENSOR5));
-      float right1 = (digitalRead(LINESENSOR1) & digitalRead(LINESENSOR2));
-      if (left1 < 1)
-      {
-        left1 = 0.5;
-      }
-      if (right1 < 1)
-      {
-        right1 = 0.5;
-      }
+      float left2 = digitalRead(LINESENSOR5);
+      float left1 = digitalRead(LINESENSOR4);
+      float center = digitalRead(LINESENSOR3);
+      float right1 = digitalRead(LINESENSOR2);
+      float right2 = digitalRead(LINESENSOR1);
       float dist1 = readUS1_distance();
-      delay(25);
-      // Основное движение
-      motorA_setpower(MPWR * right1, true);
-      motorB_setpower(MPWR * left1, false);
+      delay(10);
+      // Проверка на столкновение
       if ((dist1 != (-1)) && (dist1 < DIST1))
       {
         motorA_setpower(0, true);
         motorB_setpower(0, false);
       }
+      // Проверка линии
+      if (!left1)
+      {
+        motorA_setpower(MPWR * 1.00, true);
+        motorB_setpower(MPWR * 0.00, false);
+      }
+      if (!left2)
+      {
+        motorA_setpower(MPWR * 1.00, true);
+        motorB_setpower(-MPWR * 0.50, false);
+      }
+      if (!right1)
+      {
+        motorA_setpower(MPWR * 0.00, true);
+        motorB_setpower(MPWR * 1.00, false);
+      }
+      if (!right2)
+      {
+        motorA_setpower(-MPWR * 0.50, true);
+        motorB_setpower(MPWR * 1.00, false);
+      }
+      if (left2 && left1 && right1 && right2)
+      {
+        // Уход с линии - уменьшаем скорость
+        if (center)
+        {
+          motorA_setpower(MPWR * 0.75, true);
+          motorB_setpower(MPWR * 0.75, false);
+        }
+        else
+        {
+          motorA_setpower(MPWR * 1.00, true);
+          motorB_setpower(MPWR * 1.00, false);
+        }
+      }
+      //motorA_setpower(MPWR * right1, true);
+      //motorB_setpower(MPWR * left1, false);
       Serial.print(left1);
       Serial.print("\t");
       Serial.print(right1);
