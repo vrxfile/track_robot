@@ -2,11 +2,8 @@
   Гусеничный робот на S4A с Bluetooth
   Created by Rostislav Varzar
 */
-//#include <Servo.h>
-//#include <SoftwareSerial.h>
 #include <ServoTimer2.h>
 #include <AltSoftSerial.h>
-//#include <NewSoftSerial.h>
 
 #define IR_SENSOR A0
 
@@ -33,7 +30,7 @@
 #define DIST1 10
 
 // Параметры моторов
-#define MPWR 99
+#define MPWR 100
 
 // Переменные для управления роботом
 char command = 'S';
@@ -143,12 +140,6 @@ void loop()
       float right2 = digitalRead(LINESENSOR1);
       float dist1 = readUS1_distance();
       delay(10);
-      // Проверка на столкновение
-      if ((dist1 != (-1)) && (dist1 < DIST1))
-      {
-        motorA_setpower(0, true);
-        motorB_setpower(0, false);
-      }
       // Проверка линии
       if (!left1)
       {
@@ -158,7 +149,7 @@ void loop()
       if (!left2)
       {
         motorA_setpower(MPWR * 1.00, true);
-        motorB_setpower(-MPWR * 0.50, false);
+        motorB_setpower(-MPWR * 0.75, false);
       }
       if (!right1)
       {
@@ -167,7 +158,7 @@ void loop()
       }
       if (!right2)
       {
-        motorA_setpower(-MPWR * 0.50, true);
+        motorA_setpower(-MPWR * 0.75, true);
         motorB_setpower(MPWR * 1.00, false);
       }
       if (left2 && left1 && right1 && right2)
@@ -175,8 +166,8 @@ void loop()
         // Уход с линии - уменьшаем скорость
         if (center)
         {
-          motorA_setpower(MPWR * 0.75, true);
-          motorB_setpower(MPWR * 0.75, false);
+          motorA_setpower(MPWR * 0.85, true);
+          motorB_setpower(MPWR * 0.85, false);
         }
         else
         {
@@ -184,13 +175,12 @@ void loop()
           motorB_setpower(MPWR * 1.00, false);
         }
       }
-      //motorA_setpower(MPWR * right1, true);
-      //motorB_setpower(MPWR * left1, false);
-      Serial.print(left1);
-      Serial.print("\t");
-      Serial.print(right1);
-      Serial.print("\t");
-      Serial.println("");
+      // Проверка на столкновение
+      if ((dist1 != (-1)) && (dist1 < DIST1))
+      {
+        motorA_setpower(0, true);
+        motorB_setpower(0, false);
+      }
     }
   }
   else if (!digitalRead(CRASHSENSOR2))
